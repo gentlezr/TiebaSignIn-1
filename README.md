@@ -57,16 +57,11 @@ MEOW_PUSH_URL | 完整的 MeoW HTTPS 推送地址，例如 `https://api.chuckfan
 
 ![](./assets/开启actions.gif)
 
-## 6.第一次运行actions
+## 6.第一次运行 Actions
 
-+ 自己提交一次`push`。
+进入仓库的 `Actions` 页面，选择 `Daily Tieba Sign-In`，点击 `Run workflow` 手动运行一次。
 
-将`run.txt`中的`flag`由`0`改为`1`
-
-```patch
-- flag: 0
-+ flag: 1
-```
+当前工作流只响应手动运行和每日定时任务，普通 `push` 不会触发签到。
 
 ![](./assets/运行结果.gif)
 
