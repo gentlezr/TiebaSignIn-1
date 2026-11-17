@@ -12,7 +12,7 @@ import time
 from datetime import datetime, timezone, timedelta
 
 from tieba_client import TiebaClient
-import wechat_notify
+import meow_notify
 
 BJ_TZ = timezone(timedelta(hours=8))
 logging.Formatter.converter = staticmethod(
@@ -75,19 +75,18 @@ def sign_round(
     return failed
 
 
-def build_wechat_content(total: int, stats: dict) -> str:
+def build_push_content(total: int, stats: dict) -> str:
     date_str = datetime.now(BJ_TZ).strftime("%Y-%m-%d %H:%M:%S")
     lines = [
-        "# 贴吧签到结果",
-        f"> 时间：{date_str}",
-        f"- 贴吧总数：**{total}**",
-        f"- 签到成功：**{stats['success']}**",
-        f"- 已经签到：{stats['exist']}",
-        f"- 被屏蔽的：{stats['shield']}",
-        f"- 签到失败：{stats['error']}",
+        f"时间：{date_str}",
+        f"贴吧总数：{total}",
+        f"签到成功：{stats['success']}",
+        f"已经签到：{stats['exist']}",
+        f"被屏蔽的：{stats['shield']}",
+        f"签到失败：{stats['error']}",
     ]
     if stats["error"] > 0:
-        lines.append("> 存在签到失败的贴吧，请查看 Actions 运行日志")
+        lines.append("存在签到失败的贴吧，请查看 Actions 运行日志。")
     return "\n".join(lines)
 
 
@@ -107,7 +106,7 @@ def main() -> None:
     forums = client.get_favorites()
     if not forums:
         logger.warning("未获取到关注的贴吧，签到结束")
-        wechat_notify.send_markdown("# 贴吧签到结果\n> 未获取到关注的贴吧，签到结束")
+        meow_notify.send_message("贴吧签到结果", "未获取到关注的贴吧，签到结束。")
         return
 
     total = len(forums)
@@ -151,20 +150,22 @@ def main() -> None:
     summary.append("================================")
     logger.info("\n".join(summary))
 
-    wechat_notify.send_markdown(build_wechat_content(total, stats))
+    meow_notify.send_message("贴吧签到结果", build_push_content(total, stats))
 
 
 if __name__ == "__main__":
     try:
         main()
     except SystemExit:
-        wechat_notify.send_markdown(
-            f"# 贴吧签到结果\n> {datetime.now(BJ_TZ)} 签到异常中断，请查看 Actions 运行日志"
+        meow_notify.send_message(
+            "贴吧签到异常",
+            f"{datetime.now(BJ_TZ).strftime('%Y-%m-%d %H:%M:%S')} 签到异常中断，请查看 Actions 运行日志。",
         )
         raise
-    except Exception as e:
+    except Exception:
         logger.exception("签到过程发生未预期异常")
-        wechat_notify.send_markdown(
-            f"# 贴吧签到结果\n> {datetime.now(BJ_TZ)} 签到异常：{e}"
+        meow_notify.send_message(
+            "贴吧签到异常",
+            f"{datetime.now(BJ_TZ).strftime('%Y-%m-%d %H:%M:%S')} 签到发生未预期异常，请查看 Actions 运行日志。",
         )
         raise

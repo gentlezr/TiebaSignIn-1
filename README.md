@@ -14,7 +14,7 @@
 # 功能
 
 + 贴吧自动签到
-+ 签到结果通过企业微信群机器人推送到企业微信群
++ 签到结果通过 MeoW 推送到手机
 
 # 使用方法
 
@@ -41,13 +41,15 @@ BDUSS | xxxxxxxxxxx
 
 ![](./assets/添加BDUSS.gif)
 
-## 4.将WECHAT_WEBHOOK_KEY添加到仓库的Secrets中
+## 4.配置手机推送
 
 Name | Value
 -|-
-WECHAT_WEBHOOK_KEY | 企业微信群机器人 Webhook 地址里 key= 后面那一段
+MEOW_PUSH_URL | 完整的 MeoW HTTPS 推送地址，例如 `https://api.chuckfang.com/你的昵称/`
 
-在你 fork 的仓库 Settings → Secrets and variables → Actions → New repository secret 加一条
+在你 fork 的仓库 Settings → Secrets and variables → Actions → New repository secret 中添加。推送地址属于私人配置，请勿写进公开源码。
+
+接口格式与更多参数请参考 [MeoW API 文档](https://www.chuckfang.com/MeoW/api_doc.html)。未配置 `MEOW_PUSH_URL` 时会跳过手机推送，不影响签到流程。
 
 ## 5.开启actions
 
@@ -70,7 +72,11 @@ WECHAT_WEBHOOK_KEY | 企业微信群机器人 Webhook 地址里 key= 后面那�
 
 ## 成功了
 
-每天早上6:30将会自动进行签到。如果配置了 WECHAT_WEBHOOK_KEY，签到结果会推送到对应的企业微信群。tieba.yml 中的 workflow-keepalive job 会自动保持该定时工作流处于启用状态。
+每天早上6:30将会自动进行签到。如果配置了 `MEOW_PUSH_URL`，签到结果会通过 MeoW 推送到手机。tieba.yml 中的 workflow-keepalive job 会自动保持该定时工作流处于启用状态。
+
+## 2026-11-17
+
++ 默认推送方式由企业微信群机器人改为 MeoW 手机推送
 
 ## 2026-9-11
 
